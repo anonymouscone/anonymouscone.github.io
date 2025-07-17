@@ -6,10 +6,6 @@
     <title>Pi3</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&display=swap');
@@ -30,40 +26,24 @@
             font-family: 'Orbitron', sans-serif;
         }
         body {
-            /* font-family: 'Rajdhani', sans-serif; */
             font-family: 'Orbitron', sans-serif;
             background: linear-gradient(-45deg, #020617, #111827, #082f49, #4f46e5);
             background-size: 400% 400%;
             animation: gradient-animation 20s ease infinite;
             color: #9ca3af;
         }
-
-
-
-
-        /* 添加平滑过渡效果 */
         .group:hover .group-hover\:block {
             display: block !important;
             animation: fadeIn 0.2s ease-in-out;
         }
-
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        
         .gradient-bg {
             position: relative;
             overflow: hidden; 
         }
-
         .background-video {
             position: absolute; 
             top: 0;
@@ -73,58 +53,46 @@
             object-fit: cover; 
             z-index: -1;      
         }
-
-        @keyframes gradientAnim {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .pulse-dot {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-            50% { opacity: 0.2; }
-        }
-
         .hover-3d {
             transition: transform 0.3s ease;
         }
-
         .hover-3d:hover {
             transform: translateY(-5px) rotateX(5deg);
         }
-
-        .gradient-text {
-            position: relative; 
-            background-image: linear-gradient(to right, 
-                rgba(68,116,195,0.8) 0%,
-                rgba(96,139,229,0.8) 33%,
-                rgba(111,134,234,0.8) 66%,
-                rgba(96,110,205,0.8) 100%
-            );
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        #point-cloud-container {
+            width: 100%;
+            height: 500px;
+            background-color: #020617;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            position: relative;
         }
-
-        .gradient-text::after {
-            content: '3';
+        #point-cloud-container canvas {
+            display: block;
+        }
+        .video-selector.active {
+            border: 2px solid #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
             position: absolute;
-            top: -0.2em;
-            right: -0.4em;
-            font-size: 0.5em;
-            display: inline-block;
-            background-image: inherit;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            top: 50%;
+            left: 50%;
+            margin-top: -20px;
+            margin-left: -20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-
-
 
 <body class="font-sans antialiased">
     
@@ -144,7 +112,6 @@
                         <a href="#" class="text-white/80 hover:text-white px-3 py-2">Paper</a>
                         <a href="#" class="text-white/80 hover:text-white px-3 py-2">GitHub</a>
                         <a href="https://huggingface.co/spaces/yyfz233/Pi3" class="text-white/80 hover:text-white px-3 py-2">Demo</a>
-
                         <div class="relative group">
                             <button class="text-white/80 hover:text-white px-3 py-2 focus:outline-none">
                                 More Works
@@ -152,7 +119,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
-                            
                             <div class="absolute hidden group-hover:block pt-2 left-1/2 -translate-x-1/2 max-w-[calc(100vw-20px)]">
                                 <div class="bg-white rounded-lg shadow-lg py-2 w-[max-content] min-w-[200px] max-w-full overflow-x-auto">
                                     <div class="px-2"> 
@@ -170,13 +136,10 @@
         </div>
     </nav>
     
-
-
     <div class="gradient-bg min-h-screen flex items-center pt-20">
         <video autoplay loop muted playsinline class="background-video">
             <source src="assets/videos/teaser.mp4" type="video/mp4">
         </video>
-
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             <div class="text-center">
                 <p class="text-white mb-12 max-w-3xl mx-auto" style="font-family: 'Orbitron', sans-serif; font-size: 2.4em !important; font-weight: 900;
@@ -215,9 +178,7 @@
                         </svg>                          
                     </div>
                     <h3 class="text-xl font-semibold mb-4">Permutation-Equivariant</h3>
-                    <p class="text-gray-400">
-                        TBD
-                    </p>
+                    <p class="text-gray-400">TBD</p>
                 </div>
                 <div class="hover-3d p-8 rounded-xl shadow-lg" style="background-color: #f0f9ff;">
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
@@ -226,9 +187,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold mb-4">SOTA Performance</h3>
-                    <p class="text-gray-400">
-                        TBD
-                    </p>
+                    <p class="text-gray-400">TBD</p>
                 </div>
                 <div class="hover-3d p-8 rounded-xl shadow-lg" style="background-color: #f0f9ff;">
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
@@ -237,9 +196,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold mb-4">Robust & Efficient</h3>
-                    <p class="text-gray-400">
-                        TBD
-                    </p>
+                    <p class="text-gray-400">TBD</p>
                 </div>
             </div>
         </div>
@@ -252,32 +209,8 @@
                 text-align: center; color: #f0e9e9 !important; animation: text-glow 4s ease-in-out infinite; margin-bottom: 0px;">
                     Permutation-Equivariant
                 </h2>
-            </div>
-        </div>
-    </div>
-
-    <div class="py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-16 text-center">
-                <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2.4em !important; font-weight: 900;
-                text-align: center; color: #f0e9e9 !important; animation: text-glow 4s ease-in-out infinite; margin-bottom: 0px;">
-                    SOTA Performance
-                </h2>
-                <br>
-                <img src="./assets/images/depth_est.jpg" class="w-full h-auto rounded-xl shadow-lg object-cover">
-            </div>
-        </div>        
-    </div>
-
-    <div class="py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-16 text-center">
-                <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2.4em !important; font-weight: 900;
-                text-align: center; color: #f0e9e9 !important; animation: text-glow 4s ease-in-out infinite; margin-bottom: 0px;">
-                    Interactive Point Cloud Visualization
-                </h2>
                 <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
-                    Select a video, then a keyframe, and finally choose a point cloud to visualize.
+                    Select a video, then a keyframe, and finally choose the method to display.
                 </p>
             </div>
 
@@ -302,13 +235,28 @@
             <div id="keyframe-row" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
                 </div>
 
-            <div id="point-cloud-buttons" class="flex justify-center gap-4 mb-8" style="display: none;">
+            <div id="image-selection-buttons" class="flex justify-center gap-4 mb-8" style="display: none;">
                 </div>
 
-            <div id="point-cloud-container" class="w-full h-[500px] bg-gray-900 rounded-lg shadow-lg relative" style="display: none;">
-                 <div id="loader" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white">Select a video and keyframe above.</div>
+            <div id="image-display-container" class="w-full max-w-4xl mx-auto bg-gray-900 rounded-lg shadow-lg relative aspect-video" style="display: none;">
+                <img id="main-image-display" src="" alt="Selected Image" class="w-full h-full object-contain rounded-lg" style="display: none;">
+                <div id="image-loader" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white">Select an image to display.</div>
             </div>
+
         </div>
+    </div>
+
+    <div class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-16 text-center">
+                <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2.4em !important; font-weight: 900;
+                text-align: center; color: #f0e9e9 !important; animation: text-glow 4s ease-in-out infinite; margin-bottom: 0px;">
+                    SOTA Performance
+                </h2>
+                <br>
+                <img src="./assets/images/depth_est.jpg" class="w-full h-auto rounded-xl shadow-lg object-cover">
+            </div>
+        </div>        
     </div>
 
     <div class="py-24">
@@ -318,126 +266,123 @@
                 text-align: center; color: #f0e9e9 !important; animation: text-glow 4s ease-in-out infinite; margin-bottom: 0px;">
                     Robust & Efficient
                 </h2>
+                <p class="text-gray-400 mt-4 max-w-3xl mx-auto">
+                    Our model demonstrates exceptional efficiency and robustness. Select a video below to visualize the corresponding reconstructed 3D point cloud. You can interact with the model by dragging to rotate, right-clicking to pan, and scrolling to zoom.
+                </p>
+            </div>
+            
+            <div id="point-cloud-selectors" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 max-w-3xl mx-auto">
+                </div>
+
+            <div id="point-cloud-container" class="max-w-3xl mx-auto">
+                <div id="point-cloud-loader" class="loader" style="display: none;"></div>
             </div>
         </div>        
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            const groups = ['1', '2', '3', '4', '5', '6', '7', '8', '1_w', '2_w', '3_w'];
-            
-            groups.forEach(groupId => {
-                const videos = document.querySelectorAll(`[data-video-group="${groupId}"] video`);
-                let loadedCount = 0;
-        
-                const playGroup = () => {
-                    videos.forEach(video => video.play());
-                };
-
-                videos.forEach(video => {
-                    
-                    const handleCanPlay = () => {
-                        loadedCount++;
-                        if (loadedCount === videos.length) {
-                            playGroup();
-                            video.removeEventListener('canplaythrough', handleCanPlay);
-                        }
-                    };
-        
-                    if (video.readyState >= 4) {
-                        loadedCount++;
-                        if (loadedCount === videos.length) playGroup();
-                    } else {
-                        video.addEventListener('canplaythrough', handleCanPlay);
-                    }
-                });
-            });
-        });
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
+            }
+        }
     </script>
+
+    <footer class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-gray-200">
+                Website source based on <a href="https://sotamak1r.github.io/deepverse/">DeepVerse</a>. We also incorporated design elements from <a href="https://aether-world.github.io/">Aether</a>.
+            </div>
+        </div>
+    </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const videoRow = document.getElementById('video-row');
             const keyframeRow = document.getElementById('keyframe-row');
-            const pointCloudContainer = document.getElementById('point-cloud-container');
-            const p_loader = document.getElementById('loader');
-            const pointCloudButtons = document.getElementById('point-cloud-buttons');
+            const imageSelectionButtons = document.getElementById('image-selection-buttons');
+            const imageDisplayContainer = document.getElementById('image-display-container');
+            const mainImageDisplay = document.getElementById('main-image-display');
+            const imageLoader = document.getElementById('image-loader');
 
-
-            // --- IMPORTANT: UPDATE YOUR FILE PATHS HERE ---
             const videoData = {
                 '1': {
                     keyframes: [
-                        { img: './assets/images/depth_est.jpg', plys: ['./assets/pointclouds/111.ply', './assets/pointclouds/111.ply', './assets/pointclouds/111.ply'] },
-                        { img: './assets/images/depth_est.jpg', plys: ['./assets/pointclouds/111.ply', './assets/pointclouds/111.ply', './assets/pointclouds/111.ply'] },
-                        { img: './assets/images/depth_est.jpg', plys: ['./assets/pointclouds/111.ply', './assets/pointclouds/111.ply', './assets/pointclouds/111.ply'] },
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'VGGT' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Ours' },
+                            ] 
+                        },
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'VGGT' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Ours' },
+                            ] 
+                        },
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'VGGT' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Ours' },
+                            ] 
+                        },
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'VGGT' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Ours' },
+                            ]
+                        }
                     ]
                 },
                 '2': {
                     keyframes: [
-                        { img: './assets/images/depth_est.jpg', plys: ['./assets/pointclouds/111.ply', './assets/pointclouds/111.ply', './assets/pointclouds/111.ply'] },
-                        { img: './assets/images/depth_est.jpg', plys: ['./assets/pointclouds/111.ply', './assets/pointclouds/111.ply', './assets/pointclouds/111.ply'] },
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'VGGT' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Ours' },
+                            ] 
+                        },
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'VGGT' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Ours' },
+                            ]
+                        }
                     ]
                 },
                 '3': {
                     keyframes: [
-                        { img: './assets/images/depth_est.jpg', plys: ['./assets/pointclouds/111.ply', './assets/pointclouds/111.ply', './assets/pointclouds/111.ply'] },
-                        { img: 'path/to/your/video3_keyframe2.jpg', plys: ['path/to/your/pc3_kf2_v1.ply', 'path/to/your/pc3_kf2_v2.ply', 'path/to/your/pc3_kf2_v3.ply'] },
-                        { img: 'path/to/your/video3_keyframe3.jpg', plys: ['path/to/your/pc3_kf3_v1.ply', 'path/to/your/pc3_kf3_v2.ply', 'path/to/your/pc3_kf3_v3.ply'] }
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'VGGT' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Ours' },
+                            ] 
+                        },
+                        { 
+                            img: './assets/images/depth_est.jpg', 
+                            images: [
+                                { path: './assets/images/depth_est.jpg',  text: 'Image A' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Image B' },
+                                { path: './assets/images/depth_est.jpg',  text: 'Image C' }
+                            ]
+                        }
                     ]
                 }
             };
 
-            let scene, camera, renderer, controls;
-
-            function initThreeJS() {
-                scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(75, pointCloudContainer.clientWidth / pointCloudContainer.clientHeight, 0.1, 1000);
-                renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(pointCloudContainer.clientWidth, pointCloudContainer.clientHeight);
-                pointCloudContainer.appendChild(renderer.domElement);
-
-                controls = new THREE.OrbitControls(camera, renderer.domElement);
-                camera.position.z = 5;
-
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-                scene.add(ambientLight);
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-                directionalLight.position.set(0, 1, 0);
-                scene.add(directionalLight);
-
-                animate();
+            function displayImage(imagePath) {
+                imageLoader.style.display = 'none';
+                mainImageDisplay.src = imagePath;
+                mainImageDisplay.style.display = 'block';
             }
-
-            function animate() {
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            }
-
-            function loadPointCloud(plyPath) {
-                if (scene) {
-                    while(scene.children.length > 0){ 
-                        scene.remove(scene.children[0]); 
-                    }
-                }
-
-                const plyLoader = new THREE.PLYLoader();
-                p_loader.style.display = 'block';
-                p_loader.innerText = 'Loading...';
-
-                plyLoader.load(plyPath, function (geometry) {
-                    geometry.computeVertexNormals();
-                    const material = new THREE.PointsMaterial({ size: 0.01, vertexColors: true });
-                    const points = new THREE.Points(geometry, material);
-                    scene.add(points);
-                    p_loader.style.display = 'none';
-                }, undefined, function (error) {
-                    console.error('An error happened during PLY loading:', error);
-                    p_loader.innerText = 'Error loading point cloud.';
-                });
-            }
-
 
             videoRow.addEventListener('click', function(e) {
                 const videoWrapper = e.target.closest('[data-video-id]');
@@ -446,8 +391,9 @@
                     const data = videoData[videoId];
                     
                     keyframeRow.innerHTML = '';
-                    pointCloudButtons.innerHTML = '';
-                    pointCloudButtons.style.display = 'none';
+                    imageSelectionButtons.innerHTML = '';
+                    imageSelectionButtons.style.display = 'none';
+                    imageDisplayContainer.style.display = 'none';
 
                     if (data && data.keyframes) {
                         data.keyframes.forEach(frame => {
@@ -456,26 +402,25 @@
                             keyframeElement.innerHTML = `<img src="${frame.img}" alt="Keyframe" class="w-full h-auto">`;
                             
                             keyframeElement.addEventListener('click', () => {
-                                pointCloudContainer.style.display = 'block';
-                                p_loader.innerText = 'Please select a point cloud version.';
-                                p_loader.style.display = 'block';
-                                
-                                if (!renderer) {
-                                    initThreeJS();
-                                }
+                                imageDisplayContainer.style.display = 'block';
+                                imageLoader.innerText = 'Please select an image version.';
+                                imageLoader.style.display = 'block';
+                                mainImageDisplay.style.display = 'none';
 
-                                pointCloudButtons.style.display = 'flex';
-                                pointCloudButtons.innerHTML = ''; 
+                                imageSelectionButtons.style.display = 'flex';
+                                imageSelectionButtons.innerHTML = ''; 
 
-                                if (frame.plys) {
-                                    frame.plys.forEach((plyPath, index) => {
+                                if (frame.images) {
+                                    frame.images.forEach((imageData) => {
                                         const button = document.createElement('button');
                                         button.className = 'px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500';
-                                        button.innerText = `Point Cloud ${index + 1}`;
+                                        
+                                        button.innerText = imageData.text; 
+                                        
                                         button.addEventListener('click', () => {
-                                            loadPointCloud(plyPath);
+                                            displayImage(imageData.path); 
                                         });
-                                        pointCloudButtons.appendChild(button);
+                                        imageSelectionButtons.appendChild(button);
                                     });
                                 }
                             });
@@ -486,66 +431,148 @@
             });
         });
     </script>
-    <footer class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center text-gray-200">
-                Website source based on <a href="https://sotamak1r.github.io/deepverse/">DeepVerse</a>. We also incorporated design elements from <a href="https://aether-world.github.io/">Aether</a>.
-            </div>
-        </div>
-    </footer>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
 
-    <script>
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+        // --- IMPORTANT: CUSTOMIZE YOUR VIDEO AND POINT CLOUD PATHS HERE ---
+        const pointCloudData = [
+            {
+                video: 'assets/videos/teaser.mp4', // Replace with your video path
+                pcd: 'assets/pointclouds/111.ply'      // Replace with your PCD file path
+            },
+            {
+                video: 'assets/videos/teaser.mp4',
+                pcd: 'assets/pointclouds/111.ply'
+            },
+            {
+                video: 'assets/videos/teaser.mp4',
+                pcd: 'assets/pointclouds/111.ply'
+            },
+            {
+                video: 'assets/videos/teaser.mp4',
+                pcd: 'assets/pointclouds/111.ply'
+            }
+        ];
+
+        let scene, camera, renderer, controls;
+        let currentPoints = null;
+
+        const container = document.getElementById('point-cloud-container');
+        const loaderElement = document.getElementById('point-cloud-loader');
+        const selectorsContainer = document.getElementById('point-cloud-selectors');
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020617);
+
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 1, 5);
+            camera.up.set(0, 1, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 0.5;
+            controls.maxDistance = 20;
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            populateSelectors();
+            animate();
+        }
+
+        function populateSelectors() {
+            pointCloudData.forEach((data, index) => {
+                const selector = document.createElement('div');
+                selector.className = 'video-selector cursor-pointer rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300';
+                selector.dataset.pcdPath = data.pcd;
+                selector.innerHTML = `<video muted playsinline loop class="w-full h-auto pointer-events-none"><source src="${data.video}" type="video/mp4"></video>`;
+                
+                selector.addEventListener('mouseenter', e => e.target.querySelector('video')?.play());
+                selector.addEventListener('mouseleave', e => e.target.querySelector('video')?.pause());
+
+                selector.addEventListener('click', () => {
+                    loadPointCloud(data.pcd);
+                    document.querySelectorAll('.video-selector').forEach(el => el.classList.remove('active'));
+                    selector.classList.add('active');
                 });
+                selectorsContainer.appendChild(selector);
             });
-        });
+        }
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fade-in');
+        function loadPointCloud(path) {
+            if (currentPoints) {
+                scene.remove(currentPoints);
+                currentPoints.geometry.dispose();
+                currentPoints.material.dispose();
+            }
+            loaderElement.style.display = 'block';
+
+            const loader = new PCDLoader();
+            loader.load(path, 
+                (points) => {
+                    currentPoints = points;
+                    currentPoints.geometry.center();
+                    currentPoints.geometry.rotateX(Math.PI); // Adjust orientation if needed
+                    scene.add(currentPoints);
+                    loaderElement.style.display = 'none';
+                },
+                (xhr) => { // onProgress
+                    // console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                },
+                (error) => { // onError
+                    console.error('An error happened while loading the PCD file.', error);
+                    loaderElement.style.display = 'none';
                 }
-            });
-        }, {
-            threshold: 0.1
-        });
+            );
+        }
 
-        document.querySelectorAll('.hover-3d').forEach((el) => observer.observe(el));
+        function onWindowResize() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
 
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        init();
+        
+        // Load the first point cloud by default and set its selector to active
+        if (pointCloudData.length > 0) {
+            loadPointCloud(pointCloudData[0].pcd);
+            selectorsContainer.children[0].classList.add('active');
+        }
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.getElementById('main-nav');
-            let lastScroll = 0;
-
             window.addEventListener('scroll', () => {
-                const currentScroll = window.pageYOffset;
-                 
-                if (currentScroll > 50) {
-                    nav.classList.add('bg-white', 'shadow-md', 'backdrop-blur-md');
-                    nav.classList.remove('bg-transparent');
+                if (window.pageYOffset > 50) {
+                    nav.classList.add('bg-white', 'shadow-md');
                     nav.querySelector('span').classList.replace('text-white', 'text-gray-900');
-                    nav.querySelectorAll('a').forEach(link => {
-                        link.classList.replace('text-white/80', 'text-gray-600');
-                    });
-                    nav.querySelectorAll('button').forEach(link => {
+                    nav.querySelectorAll('a, button').forEach(link => {
                         link.classList.replace('text-white/80', 'text-gray-600');
                     });
                 } else {
-                    nav.classList.remove('bg-white', 'shadow-md', 'backdrop-blur-md');
-                    nav.classList.add('bg-transparent');
+                    nav.classList.remove('bg-white', 'shadow-md');
                     nav.querySelector('span').classList.replace('text-gray-900', 'text-white');
-                    nav.querySelectorAll('a').forEach(link => {
-                        link.classList.replace('text-gray-600', 'text-white/80');
-                    });
-                    nav.querySelectorAll('button').forEach(link => {
+                    nav.querySelectorAll('a, button').forEach(link => {
                         link.classList.replace('text-gray-600', 'text-white/80');
                     });
                 }
-                
-                lastScroll = currentScroll;
             });
         });
     </script>
