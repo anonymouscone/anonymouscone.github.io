@@ -435,75 +435,73 @@
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
-    
-        // --- IMPORTANT: CUSTOMIZE YOUR VIDEO AND POINT CLOUD PATHS HERE ---
-        // Ensure these paths are correct for your project structure!
+        import { PLYLoader } from 'three/addons/loaders/PLYLoader.js'; // <-- Changed to PLYLoader
+
+        // --- IMPORTANT: CUSTOMIZE YOUR VIDEO AND .PLY FILE PATHS HERE ---
         const pointCloudData = [
             {
-                video: 'assets/videos/teaser.mp4', // Replace with your video path
-                pcd: 'assets/pointclouds/111.ply'      // Replace with your PCD file path
+                video: 'assets/videos/teaser.mp4',
+                pcd: 'assets/pointclouds/111.ply'      // <-- Use .ply extension
             },
             {
                 video: 'assets/videos/teaser.mp4',
-                pcd: 'assets/pointclouds/111.ply'
+                pcd: 'assets/pointclouds/111.ply'      // <-- Use .ply extension
             },
             {
                 video: 'assets/videos/teaser.mp4',
-                pcd: 'assets/pointclouds/111.ply'
+                pcd: 'assets/pointclouds/111.ply'      // <-- Use .ply extension
             },
             {
                 video: 'assets/videos/teaser.mp4',
-                pcd: 'assets/pointclouds/111.ply'
+                pcd: 'assets/pointclouds/111.ply'     // <-- Use .ply extension
             }
         ];
-    
+
         let scene, camera, renderer, controls;
         let currentPoints = null;
-    
+
         const container = document.getElementById('point-cloud-container');
         const loaderElement = document.getElementById('point-cloud-loader');
         const selectorsContainer = document.getElementById('point-cloud-selectors');
-    
+
         function init() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x020617);
-    
+
             camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 0, 5); // Adjusted camera start position
+            camera.position.set(0, 0, 5);
             camera.up.set(0, 1, 0);
             scene.add(camera);
-    
+
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
-    
+
             controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             controls.screenSpacePanning = false;
             controls.minDistance = 0.5;
             controls.maxDistance = 20;
-            // Set the target to the center of the scene for better initial rotation
             controls.target.set(0, 0, 0);
-    
+
             window.addEventListener('resize', onWindowResize, false);
-    
+
             populateSelectors();
             animate();
         }
-    
+
         function populateSelectors() {
             pointCloudData.forEach((data, index) => {
                 const selector = document.createElement('div');
                 selector.className = 'video-selector cursor-pointer rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300';
-                selector.dataset.pcdPath = data.pcd;
+                selector.dataset.pcdPath = data.pcd; // We can keep the dataset name
                 selector.innerHTML = `<video muted playsinline loop class="w-full h-auto pointer-events-none"><source src="${data.video}" type="video/mp4"></video>`;
                 
                 selector.addEventListener('mouseenter', e => e.target.querySelector('video')?.play());
                 selector.addEventListener('mouseleave', e => e.target.querySelector('video')?.pause());
-    
+
                 selector.addEventListener('click', () => {
                     loadPointCloud(data.pcd);
                     document.querySelectorAll('.video-selector').forEach(el => el.classList.remove('active'));
@@ -512,7 +510,7 @@
                 selectorsContainer.appendChild(selector);
             });
         }
-    
+
         function loadPointCloud(path) {
             if (currentPoints) {
                 scene.remove(currentPoints);
@@ -520,20 +518,26 @@
                 currentPoints.material.dispose();
             }
             loaderElement.style.display = 'block';
-    
-            const loader = new PCDLoader();
+
+            const loader = new PLYLoader(); // <-- Use PLYLoader
             loader.load(path, 
-                // onSuccess callback
-                (points) => {
-                    currentPoints = points;
+                // onSuccess callback receives a geometry
+                (geometry) => {
+                    // Create a material for the points
+                    // 'vertexColors' must be true if your PLY has color data
+                    const material = new THREE.PointsMaterial({
+                        size: 0.02,
+                        vertexColors: true 
+                    });
+
+                    // Create the THREE.Points object
+                    currentPoints = new THREE.Points(geometry, material);
+
                     // Center the geometry and adjust orientation
-                    points.geometry.center();
-                    points.geometry.rotateX(Math.PI); 
+                    // You may need to adjust the rotation based on your model's original orientation
+                    currentPoints.geometry.center();
+                    currentPoints.geometry.rotateX(-Math.PI / 2); 
                     
-                    // Adjust point size and color
-                    points.material.size = 0.05;
-                    points.material.color.set(0xffffff); // Set a default color like white
-    
                     scene.add(currentPoints);
                     loaderElement.style.display = 'none';
                 },
@@ -548,19 +552,19 @@
                 }
             );
         }
-    
+
         function onWindowResize() {
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(container.clientWidth, container.clientHeight);
         }
-    
+
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
             renderer.render(scene, camera);
         }
-    
+
         init();
         
         // Load the first point cloud by default and set its selector to active
@@ -569,131 +573,7 @@
             selectorsContainer.children[0].classList.add('active');
         }
     </script>
-
-    <!-- <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
-
-        // --- IMPORTANT: CUSTOMIZE YOUR VIDEO AND POINT CLOUD PATHS HERE ---
-        const pointCloudData = [
-            {
-                video: 'assets/videos/teaser.mp4', // Replace with your video path
-                pcd: 'assets/pointclouds/111.ply'      // Replace with your PCD file path
-            },
-            {
-                video: 'assets/videos/teaser.mp4',
-                pcd: 'assets/pointclouds/111.ply'
-            },
-            {
-                video: 'assets/videos/teaser.mp4',
-                pcd: 'assets/pointclouds/111.ply'
-            },
-            {
-                video: 'assets/videos/teaser.mp4',
-                pcd: 'assets/pointclouds/111.ply'
-            }
-        ];
-
-        let scene, camera, renderer, controls;
-        let currentPoints = null;
-
-        const container = document.getElementById('point-cloud-container');
-        const loaderElement = document.getElementById('point-cloud-loader');
-        const selectorsContainer = document.getElementById('point-cloud-selectors');
-
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x020617);
-
-            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 1, 5);
-            camera.up.set(0, 1, 0);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
-
-            controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.screenSpacePanning = false;
-            controls.minDistance = 0.5;
-            controls.maxDistance = 20;
-
-            window.addEventListener('resize', onWindowResize, false);
-
-            populateSelectors();
-            animate();
-        }
-
-        function populateSelectors() {
-            pointCloudData.forEach((data, index) => {
-                const selector = document.createElement('div');
-                selector.className = 'video-selector cursor-pointer rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300';
-                selector.dataset.pcdPath = data.pcd;
-                selector.innerHTML = `<video muted playsinline loop class="w-full h-auto pointer-events-none"><source src="${data.video}" type="video/mp4"></video>`;
-                
-                selector.addEventListener('mouseenter', e => e.target.querySelector('video')?.play());
-                selector.addEventListener('mouseleave', e => e.target.querySelector('video')?.pause());
-
-                selector.addEventListener('click', () => {
-                    loadPointCloud(data.pcd);
-                    document.querySelectorAll('.video-selector').forEach(el => el.classList.remove('active'));
-                    selector.classList.add('active');
-                });
-                selectorsContainer.appendChild(selector);
-            });
-        }
-
-        function loadPointCloud(path) {
-            if (currentPoints) {
-                scene.remove(currentPoints);
-                currentPoints.geometry.dispose();
-                currentPoints.material.dispose();
-            }
-            loaderElement.style.display = 'block';
-
-            const loader = new PCDLoader();
-            loader.load(path, 
-                (points) => {
-                    currentPoints = points;
-                    currentPoints.geometry.center();
-                    currentPoints.geometry.rotateX(Math.PI); // Adjust orientation if needed
-                    scene.add(currentPoints);
-                    loaderElement.style.display = 'none';
-                },
-                (xhr) => { // onProgress
-                    // console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                },
-                (error) => { // onError
-                    console.error('An error happened while loading the PCD file.', error);
-                    loaderElement.style.display = 'none';
-                }
-            );
-        }
-
-        function onWindowResize() {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
-        init();
-        
-        // Load the first point cloud by default and set its selector to active
-        if (pointCloudData.length > 0) {
-            loadPointCloud(pointCloudData[0].pcd);
-            selectorsContainer.children[0].classList.add('active');
-        }
-    </script> -->
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.getElementById('main-nav');
